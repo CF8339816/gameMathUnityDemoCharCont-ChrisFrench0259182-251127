@@ -9,7 +9,7 @@ public class FPCSControler : MonoBehaviour
     [SerializeField] float DecelSpeed;
     [SerializeField] float MinSpeed;
     [SerializeField] float MaxSpeed;
-
+    //float m_Height;
 
 
 
@@ -27,6 +27,10 @@ public class FPCSControler : MonoBehaviour
     void Update()
     {
         Vector3 inputVector = Vector3.zero;
+
+
+
+
 
         if (Input.GetKey(KeyCode.W))
         {
@@ -53,6 +57,17 @@ public class FPCSControler : MonoBehaviour
             speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
             inputVector.x += speed;
         }
+
+        while ((Input.GetKey(KeyCode.LeftShift)) || (Input.GetKey(KeyCode.RightShift)))
+        {
+
+            speed = 2 * Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
+            //inputVector.x += speed;
+            //inputVector.x -= speed;
+            //inputVector.y += speed;
+            //inputVector.y -= speed;
+
+        }
         if (Input.GetKey(KeyCode.Space))
         {
             inputVector.y += 2;
@@ -61,9 +76,11 @@ public class FPCSControler : MonoBehaviour
         //{
         //    inputVector.y = 0;
         //}
-        if((Input.GetKey(KeyCode.LeftControl)) || (Input.GetKey(KeyCode.RightControl)))  //allows for either ctrl key to be used for crouch since the rubric did not specify left or right
+       while ((Input.GetKey(KeyCode.LeftControl)) || (Input.GetKey(KeyCode.RightControl)))  //allows for either ctrl key to be used for crouch since the rubric did not specify left or right
         {
-            inputVector.y -= .5f;
+            //inputVector.y -= .5F;
+
+            //CharacterController.m_Height= ;
         }
         //else
         //{
