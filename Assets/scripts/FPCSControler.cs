@@ -15,6 +15,10 @@ public class FPCSControler : MonoBehaviour
 
     void Start()
     {
+        speed = MinSpeed;
+
+
+
     }
 
   
@@ -26,21 +30,28 @@ public class FPCSControler : MonoBehaviour
 
         if (Input.GetKey(KeyCode.W))
         {
-            inputVector.z += 1;
+            speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
+            inputVector.z += speed;
 
         }
         if (Input.GetKey(KeyCode.S))
         {
-            inputVector.z -= 1;
+
+            speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
+            inputVector.z -= speed;
 
         }
         if (Input.GetKey(KeyCode.A))
         {
-            inputVector.x -= 1;
+
+            speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
+            inputVector.x -= speed;
         }
         if (Input.GetKey(KeyCode.D))
         {
-            inputVector.x += 1;
+
+            speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
+            inputVector.x += speed;
         }
         if (Input.GetKey(KeyCode.Space))
         {
@@ -50,7 +61,7 @@ public class FPCSControler : MonoBehaviour
         //{
         //    inputVector.y = 0;
         //}
-        while ((Input.GetKey(KeyCode.LeftControl)) || (Input.GetKey(KeyCode.RightControl)))  //allows for either ctrl key to be used for crouch since the rubric did not specify left or right
+        if((Input.GetKey(KeyCode.LeftControl)) || (Input.GetKey(KeyCode.RightControl)))  //allows for either ctrl key to be used for crouch since the rubric did not specify left or right
         {
             inputVector.y -= .5f;
         }
