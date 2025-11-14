@@ -6,6 +6,7 @@ public class FPCSControler : MonoBehaviour
     [SerializeField] Transform target;
    // [SerializeField] float followRange;
     [SerializeField]  float speed;
+    Vector3 playerspeed;
     [SerializeField] float AccelSpeed;
     [SerializeField] float DecelSpeed;
     [SerializeField] float MinSpeed;
@@ -77,22 +78,22 @@ public class FPCSControler : MonoBehaviour
         if (Input.GetKey(KeyCode.Space))
         {
             //inputVector.y += 2;
-            if (controler.isGrounded && inputVector.y < 0)
+            if (controler.isGrounded && playerspeed.y < 0)
             {
-                inputVector.y = -2f; // Small downward force to keep grounded
+                playerspeed.y = -2f; // Small downward force to keep grounded
             }
 
 
-            inputVector.y += Gravity * Time.deltaTime; // Apply gravity
+            playerspeed.y += Gravity * Time.deltaTime; // Apply gravity
 
 
             Vector3 moveDirection = transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical");// Apply movement (including gravity)
-            controler.Move((moveDirection * speed) * Time.deltaTime);
+            controler.Move((moveDirection * speed + playerspeed) * Time.deltaTime);
 
 
             if (Input.GetKey(KeyCode.Space) && controler.isGrounded) //smoothing logic
             {
-                inputVector.y = Mathf.Sqrt(JumpHt * -2f * Gravity);
+                playerspeed.y = Mathf.Sqrt(JumpHt * -2f * Gravity);
             }
 
 

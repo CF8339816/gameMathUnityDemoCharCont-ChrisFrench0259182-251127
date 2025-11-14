@@ -950,12 +950,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1401864709}
-  followRange: 0
   speed: 3
   AccelSpeed: 1
   DecelSpeed: 1
   MinSpeed: 0
   MaxSpeed: 6
+  Gravity: 9.81
+  JumpHt: 2
+  JumpDis: 4
 --- !u!4 &1401864709
 Transform:
   m_ObjectHideFlags: 0
