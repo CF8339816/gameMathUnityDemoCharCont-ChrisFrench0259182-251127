@@ -1,22 +1,28 @@
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 
 public class FPCSControler : MonoBehaviour
 {
     [SerializeField] Transform target;
-    [SerializeField] float followRange;
+   // [SerializeField] float followRange;
     [SerializeField]  float speed;
     [SerializeField] float AccelSpeed;
     [SerializeField] float DecelSpeed;
     [SerializeField] float MinSpeed;
     [SerializeField] float MaxSpeed;
     //float m_Height;
+    CharacterController controler;
+    [SerializeField] float Gravity = 9.81f; //meters per second squared gravity coeficcent
+    [SerializeField] float JumpHt;
+    [SerializeField] float JumpDis;
+
 
 
 
     void Start()
     {
         speed = MinSpeed;
-
+        controler = GetComponent<CharacterController>();
 
 
     }
@@ -27,8 +33,6 @@ public class FPCSControler : MonoBehaviour
     void Update()
     {
         Vector3 inputVector = Vector3.zero;
-
-
 
 
 
@@ -67,14 +71,32 @@ public class FPCSControler : MonoBehaviour
         //inputVector.y += speed;
         //inputVector.y -= speed;
 
-         //}
+        //}
 
 
         if (Input.GetKey(KeyCode.Space))
         {
-            inputVector.y += 2;
-        }
+            //inputVector.y += 2;
+            if (controler.isGrounded && inputVector.y < 0)
+            {
+                inputVector.y = -2f; // Small downward force to keep grounded
+            }
 
+
+            inputVector.y += Gravity * Time.deltaTime; // Apply gravity
+
+
+            Vector3 moveDirection = transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical");// Apply movement (including gravity)
+            controler.Move((moveDirection * speed) * Time.deltaTime);
+
+
+            if (Input.GetKey(KeyCode.Space) && controler.isGrounded) //smoothing logic
+            {
+                inputVector.y = Mathf.Sqrt(JumpHt * -2f * Gravity);
+            }
+
+
+        }   
 
 
         //else
@@ -101,12 +123,13 @@ public class FPCSControler : MonoBehaviour
         //}
 
 
-
-
-
         inputVector.Normalize();
 
         transform.Translate(new Vector3(inputVector.x, inputVector.y, inputVector.z) * speed * Time.deltaTime);
 
+
+        // Check if grounded and reset vertical velocity
+        
     }
 }
+
