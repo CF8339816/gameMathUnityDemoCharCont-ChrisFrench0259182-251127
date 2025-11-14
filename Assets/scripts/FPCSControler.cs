@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
+using UnityEngine.ProBuilder.MeshOperations;
 
 public class FPCSControler : MonoBehaviour
 {
@@ -16,7 +17,7 @@ public class FPCSControler : MonoBehaviour
     [SerializeField] float Gravity = 9.81f; //meters per second squared gravity coeficcent
     [SerializeField] float JumpHt;
     [SerializeField] float JumpDis;
-
+    [SerializeField] float SprintMultiplier;
 
 
 
@@ -25,11 +26,7 @@ public class FPCSControler : MonoBehaviour
         speed = MinSpeed;
         controler = GetComponent<CharacterController>();
 
-        while ((Input.GetKey(KeyCode.LeftShift)) || (Input.GetKey(KeyCode.RightShift)))
-        {
-            speed = speed * 2;
-
-        }
+       
 
     }
 
@@ -44,9 +41,18 @@ public class FPCSControler : MonoBehaviour
 
         if (Input.GetKey(KeyCode.W))
         {
-            speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
-            inputVector.z += speed;
-
+            while ((Input.GetKey(KeyCode.LeftShift)) || (Input.GetKey(KeyCode.RightShift)))
+            {
+                speed = SprintMultiplier * speed;
+                MaxSpeed = SprintMultiplier * MaxSpeed;
+                AccelSpeed = SprintMultiplier * AccelSpeed;
+                speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
+                inputVector.z += speed;
+            }
+            
+                speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
+                inputVector.z += speed;
+            
         }
         if (Input.GetKey(KeyCode.S))
         {
