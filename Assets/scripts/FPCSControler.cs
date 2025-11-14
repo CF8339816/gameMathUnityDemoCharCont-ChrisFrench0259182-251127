@@ -25,6 +25,11 @@ public class FPCSControler : MonoBehaviour
         speed = MinSpeed;
         controler = GetComponent<CharacterController>();
 
+        while ((Input.GetKey(KeyCode.LeftShift)) || (Input.GetKey(KeyCode.RightShift)))
+        {
+            speed = speed * 2;
+
+        }
 
     }
 
