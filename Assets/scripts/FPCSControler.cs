@@ -86,7 +86,6 @@ public class FPCSControler : MonoBehaviour
         {
             inputVector.y -= .5F;
 
-            //CharacterController.m_Height= ;
         }
 
 
