@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.ProBuilder.MeshOperations;
 
@@ -18,15 +19,17 @@ public class FPCSControler : MonoBehaviour
     [SerializeField] float JumpHt;
     [SerializeField] float JumpDis;
     [SerializeField] float SprintMultiplier;
-
-
+    [SerializeField] float mouseSensitivity;
+    //private float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+    float mouseX;
+    [SerializeField] float rotationX = 0f;
 
     void Start()
     {
         speed = MinSpeed;
         controler = GetComponent<CharacterController>();
+        mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
 
-       
 
     }
 
@@ -137,7 +140,17 @@ public class FPCSControler : MonoBehaviour
                 inputVector.z += speed;
             
         }
+       
+        //while ((Input.GetKey(KeyCode.W)) && (Input.GetKey(KeyCode.LeftShift)) || (Input.GetKey(KeyCode.W)) && (Input.GetKey(KeyCode.RightShift)))
+        //{
 
+        //    speed = SprintMultiplier * speed;
+        //    MaxSpeed = SprintMultiplier * MaxSpeed;
+        //    AccelSpeed = SprintMultiplier * AccelSpeed;
+        //    speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
+        //    inputVector.z += speed;
+
+        //}
 
         if ((Input.GetKey(KeyCode.S)) && (Input.GetKey(KeyCode.LeftShift)) || (Input.GetKey(KeyCode.S)) && (Input.GetKey(KeyCode.RightShift)))
         {
@@ -171,6 +184,14 @@ public class FPCSControler : MonoBehaviour
             inputVector.x -= speed;
 
          }
+
+        if (mouseX != 0)
+        {
+           // float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+
+            transform.Rotate(Vector3.up * mouseX);
+
+        }
 
         inputVector.Normalize();
 
