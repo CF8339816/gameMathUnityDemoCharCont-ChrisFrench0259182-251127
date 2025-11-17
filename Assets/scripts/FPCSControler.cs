@@ -133,12 +133,13 @@ public class FPCSControler : MonoBehaviour
         if ((Input.GetKey(KeyCode.W)) && (Input.GetKey(KeyCode.LeftShift)) || (Input.GetKey(KeyCode.W)) && (Input.GetKey(KeyCode.RightShift)))
         {
             
-                speed = SprintMultiplier * speed;
+               // speed = SprintMultiplier * speed;
                 MaxSpeed = SprintMultiplier * MaxSpeed;
-                AccelSpeed = SprintMultiplier * AccelSpeed;
+               // AccelSpeed = SprintMultiplier * AccelSpeed;
                 speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
                 inputVector.z += speed;
             
+
         }
        
         //while ((Input.GetKey(KeyCode.W)) && (Input.GetKey(KeyCode.LeftShift)) || (Input.GetKey(KeyCode.W)) && (Input.GetKey(KeyCode.RightShift)))
@@ -185,13 +186,13 @@ public class FPCSControler : MonoBehaviour
 
          }
 
-        if (mouseX != 0)
-        {
-           // float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+        //if (mouseX != 0)
+        //{
+        //   // float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
 
-            transform.Rotate(Vector3.up * mouseX);
+        //    transform.Rotate(new Vector3(0, mouseX, 0 ));
 
-        }
+        //}
 
         inputVector.Normalize();
 
