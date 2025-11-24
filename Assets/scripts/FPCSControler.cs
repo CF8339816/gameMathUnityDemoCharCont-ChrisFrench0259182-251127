@@ -1,176 +1,150 @@
+using System.Threading;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.ProBuilder.MeshOperations;
+using UnityEngine.SceneManagement;
+using static UnityEditorInternal.ReorderableList;
 
 public class FPCSControler : MonoBehaviour
 {
-    [SerializeField] Transform target;
-   // [SerializeField] float followRange;
-    [SerializeField]  float speed;
-    Vector3 playerspeed;
-    [SerializeField] float AccelSpeed;
-    [SerializeField] float DecelSpeed;
-    [SerializeField] float MinSpeed;
-    [SerializeField] float MaxSpeed;
-    //float m_Height;
+    // had exponential accellerationn
+    // andspeed  in oldewr  code . so read
+    // more on controler and looked at a
+    // few more tutoruials and rewrote the code  
+
+
+
     CharacterController controler;
-    [SerializeField] float Gravity = 9.81f; //meters per second squared gravity coeficcent
-    [SerializeField] float JumpHt;
+    [SerializeField] Camera firstPersonCam;
+    [SerializeField] Transform target;
+
+    [SerializeField] float speed;
+    [SerializeField] float AccelSpeed = 4.0f;
+    [SerializeField] float DecelSpeed = 6.0f;
+    [SerializeField] float MinSpeed = 5.0f;
+    [SerializeField] float MaxSpeed = 10.0f;
+    //[SerializeField] float Gravity = 9.81f; //meters per second squared gravity coeficcent
+    [SerializeField] float Gravity = -15.0f;  //gravity valiue reccomended in turtorial 
+    [SerializeField] float JumpHt = 2.0f;
     [SerializeField] float JumpDis;
     [SerializeField] float SprintMultiplier;
+    [SerializeField] float standing = 2.0f;
+    [SerializeField] float crouching = 1.0f;
 
+       float DefaultHt;
 
+    Vector3 playerspeed;
+    Vector2 moveInput;
+
+    bool isSprinting;
+    bool isCrouching;
 
     void Start()
     {
+
+        DefaultHt = standing;
         speed = MinSpeed;
         controler = GetComponent<CharacterController>();
 
-       
-
+        Cursor.lockState = CursorLockMode.Locked; // locks and hides cursor in thecenter of the screen
     }
-
-  
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 inputVector = Vector3.zero;
-
-
-
-        if (Input.GetKey(KeyCode.W))
-        {
-                      
-          speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
-          inputVector.z += speed;
-            
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-
-            speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
-            inputVector.z -= speed;
-
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-
-            speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
-            inputVector.x -= speed;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-
-            speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
-            inputVector.x += speed;
-        }
-
-        //while ((Input.GetKey(KeyCode.LeftShift)) || (Input.GetKey(KeyCode.RightShift)))
-        //{
-
-        //    speed = 2 * Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
-        //inputVector.x += speed;
-        //inputVector.x -= speed;
-        //inputVector.y += speed;
-        //inputVector.y -= speed;
-
-        //}
-
-
-        if (Input.GetKey(KeyCode.Space))
-        {
-            //inputVector.y += 2;
-            if (controler.isGrounded && playerspeed.y < 0)
-            {
-                playerspeed.y = -2f; // Small downward force to keep grounded
-            }
-
-
-            playerspeed.y += Gravity * Time.deltaTime; // Apply gravity
-
-
-            Vector3 moveDirection = transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical");// Apply movement (including gravity)
-            controler.Move((moveDirection * speed + playerspeed) * Time.deltaTime);
-
-
-            if (Input.GetKey(KeyCode.Space) && controler.isGrounded) //smoothing logic
-            {
-                playerspeed.y = Mathf.Sqrt(JumpHt * -2f * Gravity);
-            }
-
-
-        }   
-
-
-        //else
-        //{
-        //    inputVector.y = 0;
-        //}
-
-        if ((Input.GetKey(KeyCode.LeftControl)) || (Input.GetKey(KeyCode.RightControl)))  //allows for either ctrl key to be used for crouch since the rubric did not specify left or right
-        {
-            inputVector.y -= .5F;
-
-        }
-
-
-        //while ((Input.GetKey(KeyCode.LeftControl)) || (Input.GetKey(KeyCode.RightControl)))  //allows for either ctrl key to be used for crouch since the rubric did not specify left or right
-        // {
-        //     //inputVector.y -= .5F;
-
-        //     //CharacterController.m_Height= ;
-        // }
-        //else
-        //{
-        //    inputVector.y += .5F;
-        //}
-
-
-
-       if ((Input.GetKey(KeyCode.W))&&(Input.GetKey(KeyCode.LeftShift)) || (Input.GetKey(KeyCode.W))&&(Input.GetKey(KeyCode.RightShift)))
-        {
-           // speed = SprintMultiplier * speed;
-           // MaxSpeed = SprintMultiplier * MaxSpeed;
-           // AccelSpeed = SprintMultiplier * AccelSpeed;
-            speed = SprintMultiplier * Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
-            inputVector.z += speed;
-        }
-
-        if ((Input.GetKey(KeyCode.S)) && (Input.GetKey(KeyCode.LeftShift)) || (Input.GetKey(KeyCode.S)) && (Input.GetKey(KeyCode.RightShift)))
-        {
-            //speed = SprintMultiplier * speed;
-            //MaxSpeed = SprintMultiplier * MaxSpeed;
-           // AccelSpeed = SprintMultiplier * AccelSpeed;
-            speed = SprintMultiplier * Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
-            inputVector.z -= speed;
-        }
-
-        if ((Input.GetKey(KeyCode.D)) && (Input.GetKey(KeyCode.LeftShift)) || (Input.GetKey(KeyCode.D)) && (Input.GetKey(KeyCode.RightShift)))
-        {
-            //speed = SprintMultiplier * speed;
-           // MaxSpeed = SprintMultiplier * MaxSpeed;
-           // AccelSpeed = SprintMultiplier * AccelSpeed;
-            speed = SprintMultiplier * Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
-            inputVector.x += speed;
-        }
-
-        if ((Input.GetKey(KeyCode.A)) && (Input.GetKey(KeyCode.LeftShift)) || (Input.GetKey(KeyCode.A)) && (Input.GetKey(KeyCode.RightShift)))
-        {
-           // speed = SprintMultiplier * speed;
-           // MaxSpeed = SprintMultiplier * MaxSpeed;
-           // AccelSpeed = SprintMultiplier * AccelSpeed;
-            speed = SprintMultiplier * Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
-            inputVector.x -= speed;
-        }
-
-        inputVector.Normalize();
-
-        transform.Translate(new Vector3(inputVector.x, inputVector.y, inputVector.z) * speed * Time.deltaTime);
-
-
-        // Check if grounded and reset vertical velocity
-        
+        CrouchyCrouchCrouch();
+        MoveyMoveMove();
+        JumpyJumpJump();
     }
-}
 
+    private void MoveyMoveMove()
+    {
+        float targetSpeed = isSprinting ? MaxSpeed : MinSpeed;
+
+        if (moveInput == Vector2.zero)
+        {
+            speed = Mathf.MoveTowards(speed, 0, DecelSpeed * Time.deltaTime); //handles no keyinput
+        }
+        else
+        {
+            speed = Mathf.MoveTowards(speed, targetSpeed, AccelSpeed * Time.deltaTime); // acceleration
+        }
+               
+        Vector3 moveDirection = transform.right * moveInput.x + transform.forward * moveInput.y;// Creates mvmnt rel to plyr fwd
+
+        //setting upmovement  speed
+        playerspeed.x = moveDirection.x * speed;
+        playerspeed.z = moveDirection.z * speed;
+    }
+
+    private void JumpyJumpJump()
+    {
+        if (!controler.isGrounded)// applies gravity if not on ground
+        {
+            playerspeed.y += Gravity * Time.deltaTime;// simulated gravity constant
+        }
+        else
+        {
+            if (playerspeed.y < 0)
+            {
+                playerspeed.y = -2f;// small neg force to ensure ground contact of player.
+            }
+        }
+        controler.Move(playerspeed * Time.deltaTime);// uses controler object for movement
+    }
+
+    private void CrouchyCrouchCrouch()
+    {
+         DefaultHt = isCrouching ? crouching : standing; // det crouch or stand  movement direction
+
+        controler.height = Mathf.Lerp(controler.height, DefaultHt, Time.deltaTime * 5f);// ht change for crouch
+
+        if (firstPersonCam != null) //helps control the child fps cam during jump and crouch
+        {
+            float DefaultCamY = isCrouching ? crouching * 0.5f : standing * 0.8f;
+            Vector3 newCamPos = firstPersonCam.transform.localPosition;
+            newCamPos.y = Mathf.Lerp(newCamPos.y, DefaultCamY, Time.deltaTime * 5f);
+            firstPersonCam.transform.localPosition = newCamPos;
+        }
+
+        if (isCrouching)
+        {
+            isSprinting = false; // S.E.
+        }
+    }
+
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        moveInput = context.ReadValue<Vector2>();
+    }
+
+    public void OnSprint(InputAction.CallbackContext context)
+    {
+        isSprinting = context.performed || context.started;
+    }
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if (context.performed && controler.isGrounded)
+        {
+            playerspeed.y = Mathf.Sqrt(JumpHt * 2f * Mathf.Abs(Gravity));// because grav is neg in inspector, so use Mathf.Abs() to compensate
+        }
+    }
+
+    public void OnCrouch(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            isCrouching = !isCrouching;
+        }
+    }
+
+
+
+
+
+
+
+
+
+}
