@@ -41,17 +41,9 @@ public class FPCSControler : MonoBehaviour
 
         if (Input.GetKey(KeyCode.W))
         {
-            while ((Input.GetKey(KeyCode.LeftShift)) || (Input.GetKey(KeyCode.RightShift)))
-            {
-                speed = SprintMultiplier * speed;
-                MaxSpeed = SprintMultiplier * MaxSpeed;
-                AccelSpeed = SprintMultiplier * AccelSpeed;
-                speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
-                inputVector.z += speed;
-            }
-            
-                speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
-                inputVector.z += speed;
+                      
+          speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
+          inputVector.z += speed;
             
         }
         if (Input.GetKey(KeyCode.S))
@@ -134,6 +126,43 @@ public class FPCSControler : MonoBehaviour
         //    inputVector.y += .5F;
         //}
 
+
+
+       if ((Input.GetKey(KeyCode.W))&&(Input.GetKey(KeyCode.LeftShift)) || (Input.GetKey(KeyCode.W))&&(Input.GetKey(KeyCode.RightShift)))
+        {
+           // speed = SprintMultiplier * speed;
+           // MaxSpeed = SprintMultiplier * MaxSpeed;
+           // AccelSpeed = SprintMultiplier * AccelSpeed;
+            speed = SprintMultiplier * Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
+            inputVector.z += speed;
+        }
+
+        if ((Input.GetKey(KeyCode.S)) && (Input.GetKey(KeyCode.LeftShift)) || (Input.GetKey(KeyCode.S)) && (Input.GetKey(KeyCode.RightShift)))
+        {
+            //speed = SprintMultiplier * speed;
+            //MaxSpeed = SprintMultiplier * MaxSpeed;
+           // AccelSpeed = SprintMultiplier * AccelSpeed;
+            speed = SprintMultiplier * Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
+            inputVector.z -= speed;
+        }
+
+        if ((Input.GetKey(KeyCode.D)) && (Input.GetKey(KeyCode.LeftShift)) || (Input.GetKey(KeyCode.D)) && (Input.GetKey(KeyCode.RightShift)))
+        {
+            //speed = SprintMultiplier * speed;
+           // MaxSpeed = SprintMultiplier * MaxSpeed;
+           // AccelSpeed = SprintMultiplier * AccelSpeed;
+            speed = SprintMultiplier * Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
+            inputVector.x += speed;
+        }
+
+        if ((Input.GetKey(KeyCode.A)) && (Input.GetKey(KeyCode.LeftShift)) || (Input.GetKey(KeyCode.A)) && (Input.GetKey(KeyCode.RightShift)))
+        {
+           // speed = SprintMultiplier * speed;
+           // MaxSpeed = SprintMultiplier * MaxSpeed;
+           // AccelSpeed = SprintMultiplier * AccelSpeed;
+            speed = SprintMultiplier * Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
+            inputVector.x -= speed;
+        }
 
         inputVector.Normalize();
 
