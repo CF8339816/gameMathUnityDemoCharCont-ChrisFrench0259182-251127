@@ -17,7 +17,7 @@ public class FPCSControler : MonoBehaviour
 
     CharacterController controler;
     [SerializeField] Camera firstPersonCam;
-    [SerializeField] Transform target;
+    [SerializeField] Transform FPCS;
 
     [SerializeField] float speed;
     [SerializeField] float AccelSpeed = 4.0f;
@@ -32,8 +32,15 @@ public class FPCSControler : MonoBehaviour
     [SerializeField] float standing = 2.0f;
     [SerializeField] float crouching = 1.0f;
 
-       float DefaultHt;
+    [SerializeField] float mouseResponsiveness = 100f;
+    [SerializeField] float pitchLim = 80f;
+    [SerializeField] float xAxisClamp = 0.0f;
+     
 
+
+    float DefaultHt;
+
+    Vector2 lookInput;
     Vector3 playerspeed;
     Vector2 moveInput;
 
@@ -47,20 +54,57 @@ public class FPCSControler : MonoBehaviour
         speed = MinSpeed;
         controler = GetComponent<CharacterController>();
 
+        FPCS = transform;
+        firstPersonCam = GetComponentInChildren<Camera>();
+
+
         Cursor.lockState = CursorLockMode.Locked; // locks and hides cursor in thecenter of the screen
     }
 
     // Update is called once per frame
     void Update()
     {
+
         CrouchyCrouchCrouch();
         MoveyMoveMove();
         JumpyJumpJump();
+
+        Vector3 inputVector = Vector3.zero;
+
+        if (Input.GetKey(KeyCode.W))
+{
+    speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
+    inputVector.z += speed;
+
+ }
+if (Input.GetKey(KeyCode.S))
+{
+
+    speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
+    inputVector.z -= speed;
+
+}
+if (Input.GetKey(KeyCode.A))
+{
+
+    speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
+    inputVector.x -= speed;
+}
+if (Input.GetKey(KeyCode.D))
+{
+
+    speed = Mathf.MoveTowards(speed, MaxSpeed, AccelSpeed * Time.deltaTime);
+    inputVector.x += speed;
+}
     }
 
-    private void MoveyMoveMove()
+        
+
+
+
+private void MoveyMoveMove()
     {
-        float targetSpeed = isSprinting ? MaxSpeed : MinSpeed;
+        float FPCSSpeed = isSprinting ? MaxSpeed : MinSpeed;
 
         if (moveInput == Vector2.zero)
         {
@@ -68,7 +112,7 @@ public class FPCSControler : MonoBehaviour
         }
         else
         {
-            speed = Mathf.MoveTowards(speed, targetSpeed, AccelSpeed * Time.deltaTime); // acceleration
+            speed = Mathf.MoveTowards(speed, FPCSSpeed, AccelSpeed * Time.deltaTime); // acceleration
         }
                
         Vector3 moveDirection = transform.right * moveInput.x + transform.forward * moveInput.y;// Creates mvmnt rel to plyr fwd
@@ -139,7 +183,47 @@ public class FPCSControler : MonoBehaviour
         }
     }
 
+    public void OnLook(InputAction.CallbackContext context)
+    {
+        lookInput = context.ReadValue<Vector2>();
+    }
 
+    private void LateUpdate()
+    {
+        // Calculate rotation based on input and mouse responsiveness
+        float mouseX = lookInput.x * mouseResponsiveness * Time.deltaTime;
+        float mouseY = lookInput.y * mouseResponsiveness * Time.deltaTime;
+
+        
+        xAxisClamp += mouseY;
+
+        if (xAxisClamp > pitchLim)
+        {
+            xAxisClamp = pitchLim;
+            mouseY = 0.0f; // Stop moving if over limit
+            ClampXAxisRotation(270f); // Adjust rotation values for clamping
+        }
+        else if (xAxisClamp < -pitchLim)
+        {
+            xAxisClamp = -pitchLim;
+            mouseY = 0.0f; 
+            ClampXAxisRotation(90f); 
+        }
+
+        firstPersonCam.transform.Rotate(Vector3.left * mouseY);
+
+        // Handle Yaw (Horizontal rotation)
+        FPCS.Rotate(Vector3.up * mouseX);
+    }
+
+     private void ClampXAxisRotation(float value)
+
+
+    {
+        Vector3 eulerRotation = firstPersonCam.transform.eulerAngles;
+        eulerRotation.x = value;
+        firstPersonCam.transform.eulerAngles = eulerRotation;
+    }
 
 
 
