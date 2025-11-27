@@ -5,9 +5,9 @@ public class inputcontroler : MonoBehaviour
 {
 
    [SerializeField] playercontroler CharacterController;
-
-    InputAction moveAction;
-    InputAction lookAction;
+    [SerializeField] camLookControler CameraController;
+   public InputAction moveAction;
+   public InputAction lookAction;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -23,10 +23,10 @@ public class inputcontroler : MonoBehaviour
     void Update()
     {
 
-        Vector2 movementVector = moveAction.ReadValue<Vector2>();
+        Vector3 movementVector = moveAction.ReadValue<Vector3>();
         CharacterController.Move(movementVector);
 
-        Vector2 lookVector = lookAction.ReadValue<Vector2>();
+        Vector3 lookVector = lookAction.ReadValue<Vector3>();
         CharacterController.Rotate(movementVector);
 
 
