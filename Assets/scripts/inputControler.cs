@@ -1,13 +1,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.XR;
 public class inputcontroler : MonoBehaviour
 {
 
-   [SerializeField] playercontroler CharacterController;
+    [SerializeField] playercontroler CharacterController;
     [SerializeField] camLookControler CameraController;
-   public InputAction moveAction;
-   public InputAction lookAction;
+    public InputAction moveAction;
+    public InputAction lookAction;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -16,7 +15,7 @@ public class inputcontroler : MonoBehaviour
         moveAction = InputSystem.actions.FindAction("Move");
         lookAction = InputSystem.actions.FindAction("Look");
 
-        Cursor.visible = false; 
+        Cursor.visible = false;
     }
 
     // Update is called once per frame
@@ -26,7 +25,7 @@ public class inputcontroler : MonoBehaviour
         Vector3 movementVector = moveAction.ReadValue<Vector3>();
         CharacterController.Move(movementVector);
 
-        Vector3 lookVector = lookAction.ReadValue<Vector3>();
+        Vector2 lookVector = lookAction.ReadValue<Vector2>();
         CharacterController.Rotate(movementVector);
 
 

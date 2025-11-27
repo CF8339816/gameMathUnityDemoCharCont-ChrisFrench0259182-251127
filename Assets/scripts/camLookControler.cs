@@ -1,4 +1,3 @@
-using Mono.Cecil.Cil;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -21,7 +20,7 @@ public class camLookControler : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+
     }
 
     void Rotate(Vector2 rotateVector)
@@ -33,10 +32,10 @@ public class camLookControler : MonoBehaviour
     }
 
 
-        // Update is called once per frame
-        void Update()
+    // Update is called once per frame
+    void Update()
     {
-        
+
     }
 
 
@@ -85,7 +84,7 @@ public class camLookControler : MonoBehaviour
     }
 
 
-//code frrom oldattempt is above hgere
+    //code frrom oldattempt is above hgere
 
 
 
