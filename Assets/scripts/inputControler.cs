@@ -7,14 +7,14 @@ public class inputcontroler : MonoBehaviour
     [SerializeField] camLookControler CameraController;
     public InputAction moveAction;
     public InputAction lookAction;
-
+    public InputAction jumpAction;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         moveAction = InputSystem.actions.FindAction("Move");
         lookAction = InputSystem.actions.FindAction("Look");
-
+        jumpAction = InputSystem.actions.FindAction("Jump");
         Cursor.visible = false;
     }
 
@@ -22,13 +22,14 @@ public class inputcontroler : MonoBehaviour
     void Update()
     {
 
-        Vector3 movementVector = moveAction.ReadValue<Vector3>();
+        Vector2 movementVector = moveAction.ReadValue<Vector2>();
         CharacterController.Move(movementVector);
 
-        Vector2 lookVector = lookAction.ReadValue<Vector2>();
-        CharacterController.Rotate(movementVector);
+        //Vector2 lookVector = lookAction.ReadValue<Vector2>();
+        //CharacterController.Rotate(InputAction.CallbackContext context);
 
-
+        //Vector2 jumpVector = jumpAction.ReadValue<Vector2>();
+        //CharacterController.OnJump(movementVector);
 
     }
 }
