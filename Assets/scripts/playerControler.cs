@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 public class playercontroler : MonoBehaviour
 {
     
-    CharacterController characterController;
+    public CharacterController characterController;
     [SerializeField] float MoveSpeed= 10f;
     [SerializeField] float SprintSpeed = 15f;
     [SerializeField] float CrouchSpeed = 5f;
@@ -18,16 +18,18 @@ public class playercontroler : MonoBehaviour
     [SerializeField] float JumpHt = 2.0f;
     [SerializeField] float standing = 2.0f;
     [SerializeField] float crouching = 1.0f;
-    [SerializeField] Camera firstPersonCam;
-    public float DefaultHt;
+    private Camera firstPersonCam;
+    private float DefaultHt;
 
-    public bool isSprinting;
-    public bool isCrouching;
-    Vector2 moveInput;
-    Vector3 playerspeed;
+    private bool isSprinting;
+    private bool isCrouching;
+    private Vector3 moveInput;
+    private Vector3 playerspeed;
+    private Vector2 rotateInput;
 
-
-
+    [SerializeField] float mouseResponsiveness = 100f;
+    [SerializeField] float pitchLim = 80f;
+    //[SerializeField] float yAxisClamp = 0.0f;
     //code  recycled from previous  attempts to save  time above here
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -37,31 +39,25 @@ public class playercontroler : MonoBehaviour
         DefaultHt = standing;
     }
 
-   public void Move(Vector3 moveVector)
+    public void Move(Vector3 moveVector)
     {
 
-        Vector3 move = transform.forward * moveVector.y + transform.right * moveVector.x ;  //gets direction
-        move=move*MoveSpeed*Time.deltaTime; //ensures consistant speed independant of framerate
+        Vector3 move = transform.forward * moveVector.y + transform.right * moveVector.x;  //gets direction
+        move = move * MoveSpeed * Time.deltaTime; //ensures consistant speed independant of framerate
         characterController.Move(move);// moves char
 
-
-
     }
 
 
-   public void Rotate(Vector3 rotateVector)
+    public void Rotate(Vector2 rotateVector)
     {
 
-        RotationY = rotateVector.x*RotateSpeed*Time.deltaTime;  //
-        transform.localRotation=Quaternion.Euler(0,RotationY,0);    // rotates character on the 
-       
-
-
-
+        RotationY = rotateVector.x * RotateSpeed * Time.deltaTime;  //
+        transform.localRotation = Quaternion.Euler(0, RotationY, 0);    // rotates character on the 
 
     }
 
-    //code  recycled from previous  attempts to save  time below  here
+   // code recycled from previous  attempts to save time below here
 
 
     void Update()
@@ -70,14 +66,14 @@ public class playercontroler : MonoBehaviour
         CrouchyCrouchCrouch();
         MoveyMoveMove();
         JumpyJumpJump();
-
+        //RotateyTateTate();
     }
 
     private void MoveyMoveMove()
     {
         float FPCSSpeed = isSprinting ? SprintSpeed : CrouchSpeed;
 
-        if (moveInput == Vector2.zero)
+        if (moveInput == Vector3.zero)
         {
             MoveSpeed = Mathf.MoveTowards(MoveSpeed, 0, DecelSpeed * Time.deltaTime); //handles no keyinput
         }
@@ -154,8 +150,33 @@ public class playercontroler : MonoBehaviour
         }
     }
 
-  
 
+    private void LateUpdate()
+    {
+        // Calculate rotation based on input and mouse responsiveness
+        float mouseX = rotateInput.x * mouseResponsiveness * Time.deltaTime;
+        float mouseY = rotateInput.y * mouseResponsiveness * Time.deltaTime;
+
+
+        //xAxisClamp += mousex;
+
+        //if (xAxisClamp > pitchLim)
+        //{
+        //    xAxisClamp = pitchLim;
+        //    mouseY = 0.0f; // Stop moving if over limit
+        //    ClampXAxisRotation(270f); // Adjust rotation values for clamping
+        //}
+        //else if (xAxisClamp < -pitchLim)
+        //{
+        //    xAxisClamp = -pitchLim;
+        //    mouseY = 0.0f;
+        //    ClampXAxisRotation(90f);
+        //}
+
+        firstPersonCam.transform.Rotate(Vector2.up * mouseX);
+
+
+    }
 
 
 

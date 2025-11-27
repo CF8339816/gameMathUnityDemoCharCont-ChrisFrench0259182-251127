@@ -8,7 +8,7 @@ public class camLookControler : MonoBehaviour
     public float RotateSpeed = 5f;
 
     //code from old attempt is below here 
-
+    [SerializeField] playercontroler CharacterController;
     [SerializeField] Camera firstPersonCam;
     [SerializeField] float mouseResponsiveness = 100f;
     [SerializeField] float pitchLim = 80f;
@@ -24,7 +24,7 @@ public class camLookControler : MonoBehaviour
         
     }
 
-    void Rotate(Vector3 rotateVector)
+    void Rotate(Vector2 rotateVector)
     {
 
         RotationX = rotateVector.y * RotateSpeed * Time.deltaTime;  //
@@ -69,17 +69,17 @@ public class camLookControler : MonoBehaviour
             ClampXAxisRotation(90f);
         }
 
-        firstPersonCam.transform.Rotate(Vector3.left * mouseY);
+        firstPersonCam.transform.Rotate(Vector2.left * mouseY);
 
         // Handle Yaw (Horizontal rotation)
-        FPCS.Rotate(Vector3.up * mouseX);
+        CharacterController.Rotate(Vector2.up * mouseX);
     }
 
     private void ClampXAxisRotation(float value)
 
 
     {
-        Vector3 eulerRotation = firstPersonCam.transform.eulerAngles;
+        Vector2 eulerRotation = firstPersonCam.transform.eulerAngles;
         eulerRotation.x = value;
         firstPersonCam.transform.eulerAngles = eulerRotation;
     }
