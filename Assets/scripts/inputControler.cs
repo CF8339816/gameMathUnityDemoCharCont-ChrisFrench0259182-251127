@@ -12,9 +12,10 @@ public class inputcontroler : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        moveAction = InputSystem.actions.FindAction("Move");
-        lookAction = InputSystem.actions.FindAction("Look");
-        jumpAction = InputSystem.actions.FindAction("Jump");
+        moveAction = InputSystem.actions.FindAction("Move");  // adds the look action to the input controler script to assist binding , not that it works... fml
+
+        lookAction = InputSystem.actions.FindAction("Look"); //                           ||
+        jumpAction = InputSystem.actions.FindAction("Jump"); //                          ||
         Cursor.visible = false;
     }
 

@@ -3,23 +3,32 @@ using UnityEngine.InputSystem;
 
 public class playercontroler : MonoBehaviour
 {
-
     public CharacterController characterController;
+    
     [SerializeField] float MoveSpeed = 10f;
     [SerializeField] float SprintSpeed = 15f;
     [SerializeField] float CrouchSpeed = 5f;
     [SerializeField] float RotateSpeed = 5f;
-    float RotationY;
-    private Vector3 speed;
     [SerializeField] float gravity = -15f; //has to be neg because is downward force
     [SerializeField] float jumpHeight = 2f;
+    [SerializeField] float StandHeight = 2f; // default ht of the character
+    [SerializeField] float CrouchHeight = 1f; // target ht when crouched
+    
+    private float targetHeight;
+    private float RotationY;
+    private Vector3 speed;
+    private float standSpeed = 5f;
 
-    //code  recycled from previous  attempts to save  time above here
+    private bool isCrouch = false;
+    private bool isSprint = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         characterController = GetComponent<CharacterController>();
+
+        targetHeight = StandHeight; // Start in standing position
+        characterController.height = StandHeight;
     }
 
 
@@ -27,14 +36,17 @@ public class playercontroler : MonoBehaviour
     void Update()
     {
         ApplyGravity();
-
+        characterController.height = Mathf.Lerp(characterController.height, targetHeight, standSpeed * Time.deltaTime); // defines the stand to crouch speed 
     }
 
 
     public void Move(Vector3 moveVector)
     {
+
+        float currentSpeed = isCrouch ? CrouchSpeed : MoveSpeed;
+
         Vector3 move = transform.forward * moveVector.y + transform.right * moveVector.x;  //gets direction
-        move = move * MoveSpeed * Time.deltaTime; //ensures consistant speed independant of framerate
+        move = move * currentSpeed * Time.deltaTime; //ensures consistant speed independant of framerate
         Vector3 finalMovement = move + speed * Time.deltaTime; // Apply gravity over time
         characterController.Move(finalMovement); // gravity applied movement
 
@@ -54,15 +66,9 @@ public class playercontroler : MonoBehaviour
         {
             if (context.performed) // Check if the button was pressed
             {
-                Debug.Log("Jump function was called! Input received."); // Add this line
-                if (characterController.isGrounded)
+                if (!isCrouch) // Only allow jumping if not crouching
                 {
-                    Debug.Log("Character is grounded. Applying jump velocity."); // Add this line
                     speed.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-                }
-                else
-                {
-                    Debug.Log("Character is NOT grounded. Cannot jump right now."); // Add this line
                 }
             }
         }
@@ -72,8 +78,22 @@ public class playercontroler : MonoBehaviour
         //    speed.y = Mathf.Sqrt(jumpHeight * -2f * gravity);  // calculate the jump velocity based on the ht input
         //}
     }
-
         
+    public void OnCrouch(InputAction.CallbackContext context)
+    {
+        // Check if the Ctrl key is held down (performed means the button was just pressed/held)
+        if (context.performed)
+        {
+            isCrouch = true;
+            targetHeight = CrouchHeight;
+        }
+        // Check if the Ctrl key is released (canceled means the button was released)
+        else if (context.canceled)
+        {
+            isCrouch = false;
+            targetHeight = StandHeight;
+        }
+    }
     
     //UM1
     private void ApplyGravity()
@@ -92,6 +112,8 @@ public class playercontroler : MonoBehaviour
             }
         }
     }
+
+    //UM2
 
 
 
