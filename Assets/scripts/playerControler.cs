@@ -17,19 +17,28 @@ public class playercontroler : MonoBehaviour
     [SerializeField] float StandHeight = 2f; // default ht of the character
     [SerializeField] float CrouchHeight = 1f; // target ht when crouched
 
+    [SerializeField] float accelerationRate = 5f; //accelleration and decelleration rate
+    [SerializeField] float movementSmoothTime = 0.1f; //time the accel & decel takes
+
+
     [SerializeField] float mouseSensitivity = 100f;
-    [SerializeField] Transform groundCheck;
-    [SerializeField] float groundDistance = 0.4f;
+    [SerializeField] Transform groundCheck; //checks the ground  objgect
+    [SerializeField] float groundDistance = 0.2f; //grounding variance
     [SerializeField] LayerMask groundMask;
 
     private Vector3 velocity;
     private bool isGrounded;
+    private bool isSprinting = false;
     private bool isCrouching = false;
     private float currentSpeed;
     private float xRotation = 0f;
 
-
+    private float targetSpeed;
+    private float currentHorizontalSpeed;
+    private Vector3 currentMovementInput;
+    private Vector3 smoothMoveVelocity; // vector for the SmoothDamp function
     
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -37,9 +46,9 @@ public class playercontroler : MonoBehaviour
         characterController = GetComponent<CharacterController>();
         Cursor.lockState = CursorLockMode.Locked; // lock cursor to center of screen
         currentSpeed = MoveSpeed; // presets speed at base move
-
-        //targetHeight = StandHeight; // start in standing position
         characterController.height = StandHeight;
+        targetSpeed = MoveSpeed;
+        currentHorizontalSpeed = MoveSpeed;
     }
 
 
@@ -67,12 +76,34 @@ public class playercontroler : MonoBehaviour
         float x = Input.GetAxis("Horizontal");  //movement
         float z = Input.GetAxis("Vertical");
 
-        Vector3 move = transform.right * x + transform.forward * z;
+    
+        currentMovementInput = transform.right * x + transform.forward * z;
+      
+        if (currentMovementInput.magnitude > 1)// normalizes movement input in order to prevent diagional magnatude speed increases
+        {
+            currentMovementInput.Normalize();
+        }
+
+        characterController.Move(currentMovementInput * currentHorizontalSpeed * Time.deltaTime);
+
+        if (Input.GetButtonDown("Jump") && isGrounded) // jump using input from input System
+        {
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        }
+
+       
+        velocity.y += gravity * Time.deltaTime; // applies gravity to player object
+        characterController.Move(velocity * Time.deltaTime);
+
+        
+        HandleSpeedChanges();// calls the method below that has been used to adjust the sprint and crouch speeds  and limit sprinting while crouched
+
+        currentHorizontalSpeed = Mathf.SmoothDamp(currentHorizontalSpeed,targetSpeed,ref smoothMoveVelocity.x,movementSmoothTime);//  uses SmoothDamp to adjust ease in and out of horizontal movements
 
 
         /* unity keeps telling me the shift and ctrl buttons  are not set up even though they are 
          * so  i will code these outside of the input controler but here is the code i wanted to use for the commands 
-         * 
+         * these are pre adding accelerration and decelleration so they are formated differently than the functions below
          * 
   
         //if (Input.GetButtonDown("Shift") && isGrounded)  //sprint using input from input System
@@ -104,46 +135,50 @@ public class playercontroler : MonoBehaviour
        * 
        * 
        */
-
-
-        if (Input.GetKey(KeyCode.LeftShift)) //sprinting using direct button input
+       
+                
+    }
+    //UM1
+    private void HandleSpeedChanges()
+    {
+        
+        if (isCrouching)
         {
-            currentSpeed = SprintSpeed;
+            targetSpeed = CrouchSpeed;
+            isSprinting = false; // cannot sprint while crouched
         }
-        else if (Input.GetKeyUp(KeyCode.LeftShift))
+        else if (isSprinting)
         {
-            currentSpeed = MoveSpeed;
+            targetSpeed = SprintSpeed;
         }
-
-        if (Input.GetKeyDown(KeyCode.LeftControl))//crouching usiing direct button movement
+        else
+        {
+            targetSpeed = MoveSpeed;
+        }
+              
+        if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
+        {
+            isSprinting = true;
+        }
+        if (Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift))
+        {
+            isSprinting = false;
+        }
+       
+        if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
         {
             isCrouching = !isCrouching;
             if (isCrouching)
             {
                 characterController.height = CrouchHeight;
-                currentSpeed = CrouchSpeed;
             }
-            else if (Input.GetKeyUp(KeyCode.LeftControl))
+            else
             {
                 characterController.height = StandHeight;
-                currentSpeed = MoveSpeed;
             }
         }
-
-
-
-        characterController.Move(move * currentSpeed * Time.deltaTime);
-
-    
-        if (Input.GetButtonDown("Jump") && isGrounded) // jump using input from input System
-        {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-        }
-
-        // Apply Gravity
-        velocity.y += gravity * Time.deltaTime;
-        characterController.Move(velocity * Time.deltaTime);
     }
+
 }
     
     

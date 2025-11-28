@@ -25,18 +25,6 @@ public class inputcontroler : MonoBehaviour
         Cursor.visible = false;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
 
-        //Vector2 movementVector = moveAction.ReadValue<Vector2>();
-        //CharacterController.Move(movementVector);
 
-        //Vector2 lookVector = lookAction.ReadValue<Vector2>();
-        //CharacterController.Rotate(InputAction.CallbackContext context);
-
-        //Vector2 jumpVector = jumpAction.ReadValue<Vector2>();
-        //CharacterController.OnJump(movementVector);
-
-    }
 }
