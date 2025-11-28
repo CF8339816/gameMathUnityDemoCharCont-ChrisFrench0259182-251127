@@ -12,7 +12,7 @@ public class playercontroler : MonoBehaviour
     [SerializeField] float SprintSpeed = 15f;
     [SerializeField] float CrouchSpeed = 5f;
     [SerializeField] float RotateSpeed = 5f;
-    [SerializeField] float gravity = -15f; //has to be neg because is downward force
+    [SerializeField] float gravity = -9.8 f; //has to be neg because is downward force
     [SerializeField] float jumpHeight = 2f;
     [SerializeField] float StandHeight = 2f; // default ht of the character
     [SerializeField] float CrouchHeight = 1f; // target ht when crouched
@@ -27,7 +27,7 @@ public class playercontroler : MonoBehaviour
     [SerializeField] LayerMask groundMask;
 
     private Vector3 velocity;
-    private bool isGrounded;
+    private bool isGrounded ;
     private bool isSprinting = false;
     private bool isCrouching = false;
     private float currentSpeed;
@@ -59,11 +59,14 @@ public class playercontroler : MonoBehaviour
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask); //grounded check
         if (isGrounded && velocity.y < 0)
         {
-            velocity.y = -2f; // small downward force to keep grounded
+            velocity.y = -15f; // small downward force to keep grounded
+        }
+        else 
+        { 
+            isGrounded= false;  
         }
 
-       
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;// mouse rotation
+            float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;// mouse rotation
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;     
 
         xRotation -= mouseY;
