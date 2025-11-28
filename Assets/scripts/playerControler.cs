@@ -12,7 +12,7 @@ public class playercontroler : MonoBehaviour
     [SerializeField] float SprintSpeed = 15f;
     [SerializeField] float CrouchSpeed = 5f;
     [SerializeField] float RotateSpeed = 5f;
-    [SerializeField] float gravity = -9.8 f; //has to be neg because is downward force
+    [SerializeField] float gravity = -9.8f; //has to be neg because is downward force
     [SerializeField] float jumpHeight = 2f;
     [SerializeField] float StandHeight = 2f; // default ht of the character
     [SerializeField] float CrouchHeight = 1f; // target ht when crouched
@@ -170,14 +170,15 @@ public class playercontroler : MonoBehaviour
        
         if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
         {
-            isCrouching = !isCrouching;
-            if (isCrouching)
+            isCrouching = true;
+            characterController.height = CrouchHeight;
+        }
+
+        if (Input.GetKeyUp(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+        {
             {
-                characterController.height = CrouchHeight;
-            }
-            else
-            {
-                characterController.height = StandHeight;
+                isCrouching = false;
+               characterController.height = StandHeight;
             }
         }
     }
