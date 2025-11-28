@@ -1,10 +1,13 @@
+using JetBrains.Annotations;
+using UnityEditor.Presets;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.XR;
 
 public class playercontroler : MonoBehaviour
 {
     public CharacterController characterController;
-    
+
     [SerializeField] float MoveSpeed = 10f;
     [SerializeField] float SprintSpeed = 15f;
     [SerializeField] float CrouchSpeed = 5f;
@@ -13,21 +16,29 @@ public class playercontroler : MonoBehaviour
     [SerializeField] float jumpHeight = 2f;
     [SerializeField] float StandHeight = 2f; // default ht of the character
     [SerializeField] float CrouchHeight = 1f; // target ht when crouched
-    
-    private float targetHeight;
-    private float RotationY;
-    private Vector3 speed;
-    private float standSpeed = 5f;
 
-    private bool isCrouch = false;
-    private bool isSprint = false;
+    [SerializeField] float mouseSensitivity = 100f;
+    [SerializeField] Transform groundCheck;
+    [SerializeField] float groundDistance = 0.4f;
+    [SerializeField] LayerMask groundMask;
+
+    private Vector3 velocity;
+    private bool isGrounded;
+    private bool isCrouching = false;
+    private float currentSpeed;
+    private float xRotation = 0f;
+
+
+    
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         characterController = GetComponent<CharacterController>();
+        Cursor.lockState = CursorLockMode.Locked; // lock cursor to center of screen
+        currentSpeed = MoveSpeed; // presets speed at base move
 
-        targetHeight = StandHeight; // Start in standing position
+        //targetHeight = StandHeight; // start in standing position
         characterController.height = StandHeight;
     }
 
@@ -35,88 +46,109 @@ public class playercontroler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ApplyGravity();
-        characterController.height = Mathf.Lerp(characterController.height, targetHeight, standSpeed * Time.deltaTime); // defines the stand to crouch speed 
-    }
-
-
-    public void Move(Vector3 moveVector)
-    {
-
-        float currentSpeed = isCrouch ? CrouchSpeed : MoveSpeed;
-
-        Vector3 move = transform.forward * moveVector.y + transform.right * moveVector.x;  //gets direction
-        move = move * currentSpeed * Time.deltaTime; //ensures consistant speed independant of framerate
-        Vector3 finalMovement = move + speed * Time.deltaTime; // Apply gravity over time
-        characterController.Move(finalMovement); // gravity applied movement
-
-    }
-
-    //
-    public void Rotate(InputAction.CallbackContext context)
-    {
-        Vector2 mouseDelta = context.ReadValue<Vector2>(); 
-        float mouseX = mouseDelta.x * RotateSpeed * Time.deltaTime;//sets x movement by rotating on y axis
-        transform.Rotate(Vector3.up * mouseX);// applies rotation to players move
-    }
-
-    public void OnJump(InputAction.CallbackContext context)// listens for inputas defined in the input asset
-    {
-        if (context.performed && characterController.isGrounded) // could not get this to set up correctly trying original method as that did push player up in air // checks to see if the player groundeed beefore jump, prevents double jump
+       
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask); //grounded check
+        if (isGrounded && velocity.y < 0)
         {
-            if (context.performed) // Check if the button was pressed
-            {
-                if (!isCrouch) // Only allow jumping if not crouching
-                {
-                    speed.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-                }
-            }
+            velocity.y = -2f; // small downward force to keep grounded
         }
-        //this also did not work
-        //if (Input.GetKey(KeyCode.Space))
-        //{
-        //    speed.y = Mathf.Sqrt(jumpHeight * -2f * gravity);  // calculate the jump velocity based on the ht input
-        //}
-    }
+
+       
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;// mouse rotation
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;     
+
+        xRotation -= mouseY;
+        xRotation = Mathf.Clamp(xRotation, -90f, 90f); // clamp vertical look
+
+        Camera.main.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        transform.Rotate(Vector3.up * mouseX);
+
         
-    public void OnCrouch(InputAction.CallbackContext context)
-    {
-        // Check if the Ctrl key is held down (performed means the button was just pressed/held)
-        if (context.performed)
+        float x = Input.GetAxis("Horizontal");  //movement
+        float z = Input.GetAxis("Vertical");
+
+        Vector3 move = transform.right * x + transform.forward * z;
+
+
+        /* unity keeps telling me the shift and ctrl buttons  are not set up even though they are 
+         * so  i will code these outside of the input controler but here is the code i wanted to use for the commands 
+         * 
+         * 
+  
+        //if (Input.GetButtonDown("Shift") && isGrounded)  //sprint using input from input System
+        //{
+        //    currentSpeed = SprintSpeed;
+        //}
+        //else if (Input.GetButtonUp("Shift") && isGrounded)
+        //{
+        //    currentSpeed = MoveSpeed;
+        //}
+
+   
+        //if (Input.GetButtonDown("Control") && isGrounded) //crouch using input from input System
+        //{
+        //    isCrouching = !isCrouching;
+        //    if (isCrouching)
+        //    {
+        //        characterController.height = CrouchHeight;
+        //        currentSpeed = CrouchSpeed;
+        //    }
+        //    else if (Input.GetButtonUp("Control") && isGrounded)
+        //    {
+        //        characterController.height = StandHeight;
+        //        currentSpeed = MoveSpeed;
+        //    }
+        //}
+       * 
+       * 
+       * 
+       * 
+       */
+
+
+        if (Input.GetKey(KeyCode.LeftShift)) //sprinting using direct button input
         {
-            isCrouch = true;
-            targetHeight = CrouchHeight;
+            currentSpeed = SprintSpeed;
         }
-        // Check if the Ctrl key is released (canceled means the button was released)
-        else if (context.canceled)
+        else if (Input.GetKeyUp(KeyCode.LeftShift))
         {
-            isCrouch = false;
-            targetHeight = StandHeight;
+            currentSpeed = MoveSpeed;
         }
-    }
-    
-    //UM1
-    private void ApplyGravity()
-    {
-        // Apply gravity if not grounded
-        if (!characterController.isGrounded)
+
+        if (Input.GetKeyDown(KeyCode.LeftControl))//crouching usiing direct button movement
         {
-            speed.y += gravity * Time.deltaTime; // gravity applied here
-        }
-        else
-        {
-           
-            if (speed.y < 0) // sets vertical movement to just below 0 if on ground to stay grounded
+            isCrouching = !isCrouching;
+            if (isCrouching)
             {
-                speed.y = -2f;
+                characterController.height = CrouchHeight;
+                currentSpeed = CrouchSpeed;
+            }
+            else if (Input.GetKeyUp(KeyCode.LeftControl))
+            {
+                characterController.height = StandHeight;
+                currentSpeed = MoveSpeed;
             }
         }
+
+
+
+        characterController.Move(move * currentSpeed * Time.deltaTime);
+
+    
+        if (Input.GetButtonDown("Jump") && isGrounded) // jump using input from input System
+        {
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        }
+
+        // Apply Gravity
+        velocity.y += gravity * Time.deltaTime;
+        characterController.Move(velocity * Time.deltaTime);
     }
-
-    //UM2
-
-
-
-
-
 }
+    
+    
+    
+    
+ 
+
+
